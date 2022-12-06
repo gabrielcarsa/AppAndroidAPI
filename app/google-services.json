@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "657999193031",
+    "project_id": "prova-java-2",
+    "storage_bucket": "prova-java-2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:657999193031:android:d8a2bcdb8adf9182102fe2",
+        "android_client_info": {
+          "package_name": "com.example.provajava"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "657999193031-7sa8fgrukb8l8l529cms51sj2r01aq3b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3nEjBJcp3gBs4zLrtTS0ZdDWVjUw6Yp4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "657999193031-7sa8fgrukb8l8l529cms51sj2r01aq3b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
