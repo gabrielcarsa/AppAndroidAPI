@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,7 +38,6 @@ public class MainActivitySalvos extends AppCompatActivity {
     TextView txt;
 
     RecyclerView recyclerView;
-    ArrayAdapter<Country> meuAdapter;
     ArrayList<Country> countryArrayList_ = new ArrayList<Country>();
 
     @Override
@@ -67,8 +67,9 @@ public class MainActivitySalvos extends AppCompatActivity {
 
         });
 
-        //databaseReference = firebaseDatabase.getReference("Destinos");
-        databaseReference.child("Destinos")
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        databaseReference.child("Destinos").child(user.getUid())
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {

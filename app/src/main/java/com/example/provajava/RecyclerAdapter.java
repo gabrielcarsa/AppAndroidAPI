@@ -18,27 +18,30 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.Executors;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder> {
 
 
-    ArrayList<Country> countryArrayList = new ArrayList<Country>();
+    ArrayList<Country> countryArrayList;
+    ArrayList<Country> countryArrayListCopia;
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
-    boolean show = false;
+
     boolean salvos = true;
 
     //construtor
     public RecyclerAdapter(ArrayList<Country> countryArrayList, boolean salvos) {
         this.countryArrayList = countryArrayList;
         this.salvos = salvos;
+        //duplicar o array original no construtor para manipularmos a lista sem problemas.
+        countryArrayListCopia = new ArrayList<>(countryArrayList);
     }
 
     //inner class do viewholder
@@ -79,11 +82,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                                 countryArrayList.get(getLayoutPosition()).getRegion(),
                                 countryArrayList.get(getLayoutPosition()).getFlag());
 
-
-                        databaseReference.
-                                child("Destinos").
-                                child(countryArrayList.get(getLayoutPosition()).getName()).
-                                setValue(c);
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        databaseReference.child("Destinos").child(user.getUid()).
+                                child(countryArrayList.get(getLayoutPosition()).getName()).setValue(c);
                         Toast.makeText(view.getContext(), "Adicionado com sucesso ", Toast.LENGTH_SHORT).show();
 
                     }
@@ -101,11 +102,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                 janela.setPositiveButton("Remover", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        String s = countryArrayList.get(getLayoutPosition()).getName();
-                        databaseReference.child("Destinos").child(s).removeValue();
                         removeAt(getLayoutPosition());
                         Toast.makeText(view.getContext(), "Removido com sucesso ", Toast.LENGTH_SHORT).show();
                     }
+
                 });
                 janela.setNegativeButton("Cancelar", null);
                 janela.show();
@@ -117,13 +117,22 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         }
 
         private void removeAt(int layoutPosition) {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-            countryArrayList.remove(layoutPosition);
-            notifyItemRemoved(layoutPosition);
-            notifyItemRangeChanged(layoutPosition, countryArrayList.size());
+            Country f = countryArrayList.get(layoutPosition);
+
+            //importante: sem esta linha o array não é atualizado corretamente
+            //limpa o array para correta renderização da lista
+            //após remoção, array será remontado com os valores restantes do firebase
+            countryArrayList.clear();
+
+            databaseReference.child("Destinos").child(user.getUid()).
+                    child(f.getName()).
+                    removeValue();
 
         }
     }
+
 
     @NonNull
     @Override
@@ -147,6 +156,29 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         System.out.println(imagem);
         //holder.mImageView.setImageResource();
 
+    }
+
+    public void filtrar(String text) {
+        //limpando array que monta a lista ao buscar algum termo na searchView
+        countryArrayList.clear();
+
+        //digitou algo e apagou = trazer todos
+        //lembrando que filmeArrayListCopia contém toda a informação original
+        //(populado no construtor)
+        if (text.isEmpty()) {
+            countryArrayList.addAll(countryArrayListCopia);
+        } else {
+            //algum texto digitado na busca
+            //converte para letra minúscula para não haver distinção
+            text = text.toLowerCase();
+            //percorre o array com os dados originais (todos os favoritos)
+            for (Country item : countryArrayListCopia) {
+                //caso, nos dados originais, exista o termo procurado, popule o array vazio com o item
+                if (item.getName().toLowerCase().contains(text)) {
+                    countryArrayList.add(item);
+                }
+            }
+        }
     }
 
     @Override
