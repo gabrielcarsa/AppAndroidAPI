@@ -28,7 +28,7 @@ import java.util.concurrent.Executors;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder> {
 
-    int[] imagensUsuarios = {R.drawable.ic_baseline_person_outline_24};
+
     ArrayList<Country> countryArrayList = new ArrayList<Country>();
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
